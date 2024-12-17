@@ -36,38 +36,30 @@ function extractPDFContent(pdfData) {
 }
 
 function processText(text) {
+    console.log(text);  // Verifique o conteúdo do PDF
+
     // Regex para identificar o número de telefone (ajustado para o formato fornecido)
-    const phoneRegex = /Detalhamento de Serviços N° \d{2}\s?\d{5}-\d{4}/g;
+    const phoneRegex = /Detalhamento de Serviços N° \d{2} \d{5}-\d{4}/g;
     const phones = text.match(phoneRegex);
 
     if (phones) {
-        let phoneData = {};
-
-        phones.forEach(phone => {
-            phoneData[phone] = [];
-        });
-
-        // Dividir o texto em linhas
-        const lines = text.split('\n');
-        let currentPhone = null;
-
-        lines.forEach(line => {
-            // Verifica se a linha contém um número de telefone
-            let match = line.match(phoneRegex);
-            if (match) {
-                currentPhone = match[0];
-            } else if (currentPhone) {
-                // Se a linha não contiver um telefone, tentamos extrair os dados desejados
-                const data = extractDataFromLine(line);
-                if (data) {
-                    phoneData[currentPhone].push(data);
-                }
-            }
-        });
-
-        // Exibir as informações
-        displayPhoneData(phoneData);
+        // Exibir apenas os números de telefone encontrados
+        displayPhoneNumbers(phones);
+    } else {
+        console.log("Nenhum número de telefone encontrado.");
     }
+}
+
+// Função para exibir os números de telefone encontrados
+function displayPhoneNumbers(phones) {
+    const container = document.getElementById('pdf-content');
+    container.innerHTML = ''; // Limpa o conteúdo anterior
+
+    phones.forEach(phone => {
+        let phoneElement = document.createElement('p');
+        phoneElement.innerText = phone;
+        container.appendChild(phoneElement);
+    });
 }
 
 // Função para extrair os dados das linhas após o número de telefone
