@@ -36,14 +36,13 @@ function extractPDFContent(pdfData) {
 }
 
 function processText(text) {
-    console.log(text);  // Verifique o conteúdo do PDF
+    console.log(text);  // Adicionado para exibir o conteúdo extraído do PDF
 
-    // Regex para identificar o número de telefone (ajustado para o formato fornecido)
-    const phoneRegex = /Detalhamento de Serviços N° \d{2} \d{5}-\d{4}/g;
+    // Regex para capturar números de telefone no formato "xx xxxxxx-xxxx"
+    const phoneRegex = /\d{2} \d{5}-\d{4}/g;
     const phones = text.match(phoneRegex);
 
     if (phones) {
-        // Exibir apenas os números de telefone encontrados
         displayPhoneNumbers(phones);
     } else {
         console.log("Nenhum número de telefone encontrado.");
