@@ -36,10 +36,10 @@ function extractPDFContent(pdfData) {
 }
 
 function processText(text) {
-    // Regex para identificar números de telefone (ajuste conforme a formatação do seu PDF)
-    const phoneRegex = /\(?\d{2}\)?\s?\d{4,5}-\d{4}/g;
+    // Regex para identificar o número de telefone (ajustado para o formato fornecido)
+    const phoneRegex = /Detalhamento de Serviços N° \d{2} \d{5}-\d{4}/g;
     const phones = text.match(phoneRegex);
-    
+
     if (phones) {
         let phoneData = {};
 
@@ -47,7 +47,7 @@ function processText(text) {
             phoneData[phone] = [];
         });
 
-        // Dividir o texto em linhas ou partes baseadas nos números
+        // Dividir o texto em linhas
         const lines = text.split('\n');
         let currentPhone = null;
 
@@ -57,14 +57,41 @@ function processText(text) {
             if (match) {
                 currentPhone = match[0];
             } else if (currentPhone) {
-                // Se a linha não contiver um telefone, adiciona a linha ao número atual
-                phoneData[currentPhone].push(line.trim());
+                // Se a linha não contiver um telefone, tentamos extrair os dados desejados
+                const data = extractDataFromLine(line);
+                if (data) {
+                    phoneData[currentPhone].push(data);
+                }
             }
         });
 
         // Exibir as informações
         displayPhoneData(phoneData);
     }
+}
+
+// Função para extrair os dados das linhas após o número de telefone
+function extractDataFromLine(line) {
+    // Regex para identificar os dados: DATA HORA ORIGEM DESTINO QUANTIDADE TIPO PACOTE REALIZADO TARIFADO VALOR
+    const dataRegex = /(\d{2}\/\d{2}\/\d{4})\s(\d{2}:\d{2})\s([A-Za-zá-úÁ-Ú\s]+)\s([A-Za-zá-úÁ-Ú\s]+)\s(\d+)\s([A-Za-zá-úÁ-Ú]+)\s([A-Za-zá-úÁ-Ú]+)\s([A-Za-zá-úÁ-Ú]+)\s([A-Za-zá-úÁ-Ú]+)\s([\d,]+(?:\.\d{2})?)/;
+    const match = line.match(dataRegex);
+
+    if (match) {
+        return {
+            DATA: match[1],
+            HORA: match[2],
+            ORIGEM: match[3],
+            DESTINO: match[4],
+            QUANTIDADE: match[5],
+            TIPO: match[6],
+            PACOTE: match[7],
+            REALIZADO: match[8],
+            TARIFADO: match[9],
+            VALOR: match[10]
+        };
+    }
+
+    return null;
 }
 
 function displayPhoneData(phoneData) {
@@ -79,14 +106,16 @@ function displayPhoneData(phoneData) {
         phoneTitle.innerText = `Número: ${phone}`;
         phoneSection.appendChild(phoneTitle);
 
-        let phoneDetails = document.createElement('ul');
-        phoneData[phone].forEach(detail => {
-            let listItem = document.createElement('li');
-            listItem.innerText = detail;
-            phoneDetails.appendChild(listItem);
+        phoneData[phone].forEach(entry => {
+            let entryList = document.createElement('ul');
+            for (const key in entry) {
+                let listItem = document.createElement('li');
+                listItem.innerHTML = `<strong>${key}:</strong> ${entry[key]}`;
+                entryList.appendChild(listItem);
+            }
+            phoneSection.appendChild(entryList);
         });
         
-        phoneSection.appendChild(phoneDetails);
         container.appendChild(phoneSection);
     }
 }
