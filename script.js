@@ -16,15 +16,15 @@ function handleFile(event) {
 
 function extractPDFContent(pdfData) {
     pdfjsLib.getDocument(pdfData).promise.then(pdf => {
-        let content = '';
-        let numPages = pdf.numPages;
         let fullText = '';
+        let numPages = pdf.numPages;
 
         for (let i = 1; i <= numPages; i++) {
             pdf.getPage(i).then(page => {
                 page.getTextContent().then(text => {
                     fullText += text.items.map(item => item.str).join(' ') + ' ';
                     if (i === numPages) {
+                        console.log(fullText);  // Verifique o conteúdo extraído
                         processText(fullText);
                     }
                 });
@@ -36,10 +36,8 @@ function extractPDFContent(pdfData) {
 }
 
 function processText(text) {
-    console.log(text);  // Verifique o conteúdo do PDF
-
     // Regex para identificar o número de telefone (ajustado para o formato fornecido)
-    const phoneRegex = /Detalhamento de Serviços N° \d{2} \d{5}-\d{4}/g;
+    const phoneRegex = /Detalhamento de Serviços N° \d{2}\s?\d{5}-\d{4}/g;
     const phones = text.match(phoneRegex);
 
     if (phones) {
