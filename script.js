@@ -36,8 +36,8 @@ function extractPDFContent(pdfData) {
 }
 
 function processText(text) {
-    console.log(text);  // Verifica o conteúdo do PDF
-    
+    console.log(text);  // Verifique o conteúdo do PDF
+
     // Regex para identificar o número de telefone (ajustado para o formato fornecido)
     const phoneRegex = /Detalhamento de Serviços N° \d{2} \d{5}-\d{4}/g;
     const phones = text.match(phoneRegex);
